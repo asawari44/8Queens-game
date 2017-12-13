@@ -15,7 +15,7 @@ red = (255,0,0)
 green = (34,177,76)
 blue = (0,0,255)
 black = (0,0,0)
-
+font = pygame.font.SysFont(None, 60)
 #display params
 height=640
 width=640
@@ -29,8 +29,19 @@ size = 80
 
 
 boxlist=[]
+queenlist=[]
 
+def text_objects(msg,color):
+    surf = font.render(msg,True,color)
+    return surf , surf.get_rect()
 
+def message_to_board(msg,color):
+    textSurface, textRect = text_objects(msg,color)
+    textRect.center = (width/2),(height/2)
+    gameDisplay.blit(textSurface,textRect)
+    pygame.display.update()
+    
+    
 
 def reset_board():
     count =0
@@ -47,32 +58,70 @@ def reset_board():
     gameDisplay.fill(white)
     for XnY in boxlist:
             pygame.draw.rect(gameDisplay,black, [XnY[0],XnY[1],size,size])
+            
     pygame.display.update()
-                  
+    
+    
 
 
+def check_for_win():
+    print(queenlist)
+    for i in range(0,7):
+        for j in range(i+1,8):
+            if queenlist[i][1] == queenlist[j][1]:
+                print(str(queenlist[i][1])+"="+str(queenlist[j][1]))
+                print("i="+str(i))
+                print("j="+str(j))
+                return 0
+            
+            elif abs(queenlist[i][1] - queenlist[j][1]) == abs(queenlist[i][0] - queenlist[j][0]):
+                print(str(queenlist[i][1])+"-"+str(queenlist[j][1])+"="+ str(queenlist[i][0])+"-"+str(queenlist[j][0]))
+                return 0
+                
+                
+    return 1            
+        
 
+
+    
 def placement(x_val,y_val,circlelist):
     
-    #print("drawing circle..."+ str(box[0])+","+str(box[1]))
     pygame.draw.circle(gameDisplay, red, [int(x_val),int(y_val)],10)
-    #gameDisplay.blit(img, ([int(x_val),int(y_val)-(size/2)]))
     pygame.display.update()
     circle=[]
     circle.append(x_val)
     circle.append(y_val)
     circlelist.append(circle)
     print(circlelist)
-    
-    
 
+    queen=[]
+    queen.append(int(x_val/size)+1)
+    queen.append(int(y_val/size)+1)
+    queenlist.append(queen)
+    print(queenlist)
+
+
+    if len(circlelist) == 8:
+        win=check_for_win()
+        if win == 1:
+            print("You win!!!")
+            message_to_board("You win!!!",red)
+        else:
+            print("You lost!!! Press c to continue")
+            message_to_board("You lost!!! Press c to continue",red)
+            
+            
 
 def remove_queen(x_val,y_val,circlelist):
 
     for circle in circlelist:
         if circle[0] == int(x_val) and circle[1] == int(y_val):
+            for queen in queenlist:
+                if queen[0] == (int(x_val/size)+1) and queen[1] == (int(y_val/size)+1):
+                    queenlist.remove(queen)
             circlelist.remove(circle)
             print(circlelist)
+            print(queenlist)
             for box in boxlist:
                 if box[0] == int(x_val)-(size/2) and box[1] == int(y_val)-(size/2):    
                     print("color green")
@@ -114,10 +163,7 @@ def solution():
     
     return (sol,count)                    
       
-        
-    
-    
-    
+
 def is_diagonal(point1, point2):
     x1 = point1[0]
     y1 = point1[1]
@@ -174,18 +220,17 @@ def gameloop():
                     random_number=round(random.randrange(0,count))   
                     print(sol[random_number])
                     #update board
+                    del queenlist[:]
+                    del circlelist[:]
                     reset_board()
                     render_solution(sol[random_number])
                     prev_key = "sol"
                 if event.key == pygame.K_c:
+                    del queenlist[:]
+                    del circlelist[:]
                     reset_board()
                     gameloop()        
-                    
-                    
-                
-                       
-
-            
+           
 reset_board()            
 gameloop()
 pygame.quit()
