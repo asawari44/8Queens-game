@@ -1,7 +1,7 @@
 # 8Queens-game
 
 `Problem Statement:`
-      Place 8 queens on a chess board in such a way that no queen can kill the other queen.
+      Place 8 queens on a chess board in such a way that no 2 queens can kill one another.
       
 `Solution:`
       We take backtracking approach to solve this problem. For each queen a suitable position is found in a row such that no other queen is in the same column or on the diagonal as the queen in question.
